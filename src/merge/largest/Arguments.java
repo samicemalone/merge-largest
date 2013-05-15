@@ -80,7 +80,7 @@ public class Arguments {
      * Get the destination directory File
      * @return Destination directory File
      */
-    public File getDestinationFile() {
+    public File getDestinationDirectory() {
         return destinationDirectory;
     }
 
