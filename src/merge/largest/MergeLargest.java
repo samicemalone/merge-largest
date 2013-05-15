@@ -53,13 +53,14 @@ public class MergeLargest {
     }
     
     public static void printHelp() {
-        System.out.println("Usage: MergeLargest [-hrt] [-d DESTINATION] DIRECTORY...");
+        System.out.println("Usage: merge-largest [-hrt] [-d DESTINATION] DIRECTORY...");
+        System.out.println();
         System.out.println("The largest file in each DIRECTORY will be merged into DESTINATION if -d is set.");
-        System.out.println("Otherwise they will be merged into the parent directory of the first DIRECTORY");
-        System.out.println("argument. DIRECTORY is then deleted.");
+        System.out.println("If -d is not set, DESTINATION will default to the current working directory.");
         System.out.println("After moving the largest file out of each DIRECTORY, DIRECTORY is deleted.");
-        System.out.println("The only way DIRECTORY will not be deleted is if the recursive option (-r)");
-        System.out.println("isn't set, AND DIRECTORY contains no files (regardless of subdirs).");
+        System.out.println("If the recursive option (-r) is not used, AND, DIRECTORY contains no files");
+        System.out.println("(regardless of whether DIRECTORY contains subdirectories), then DIRECTORY");
+        System.out.println("will NOT be deleted.");
         System.out.println();
         System.out.println("    -d, --dest-dir DESTINATION  Destination directory for the largest file");
         System.out.println("                                in each DIRECTORY to be moved to");
