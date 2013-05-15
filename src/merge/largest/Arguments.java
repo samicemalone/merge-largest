@@ -162,7 +162,7 @@ public class Arguments {
                 throw new FileNotFoundException("Could not find the directory: " + arg.getAbsolutePath());
             }
             if (!arg.isDirectory()) {
-                throw new DirectoryExpectedException("The input file " + arg.getAbsolutePath() + "is not a directory");
+                throw new DirectoryExpectedException("The input file " + arg.getAbsolutePath() + " is not a directory");
             }
         }
         if (args.destinationDirectory != null) {
