@@ -155,6 +155,8 @@ public class Arguments {
      * @param args Parsed Arguments
      * @throws FileNotFoundException if any of the input directories do not exist
      * @throws FileNotFoundException if the destination directory does not exist
+     * @throws DirectoryExpectedException if an input directory argument or destination
+     * directory argument is not a directory
      */
     public static void validate(Arguments args) throws FileNotFoundException, DirectoryExpectedException {
         for(File arg : args.inputDirectories) {
