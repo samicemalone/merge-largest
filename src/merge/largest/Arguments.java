@@ -33,6 +33,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import merge.largest.exception.ArgumentException;
+import merge.largest.exception.DirectoryExpectedException;
 
 /**
  * 
@@ -155,15 +156,21 @@ public class Arguments {
      * @throws FileNotFoundException if any of the input directories do not exist
      * @throws FileNotFoundException if the destination directory does not exist
      */
-    public static void validate(Arguments args) throws FileNotFoundException {
+    public static void validate(Arguments args) throws FileNotFoundException, DirectoryExpectedException {
         for(File arg : args.inputDirectories) {
             if (!arg.exists()) {
                 throw new FileNotFoundException("Could not find the directory: " + arg.getAbsolutePath());
+            }
+            if (!arg.isDirectory()) {
+                throw new DirectoryExpectedException("The input file " + arg.getAbsolutePath() + "is not a directory");
             }
         }
         if (args.destinationDirectory != null) {
             if (!args.destinationDirectory.exists()) {
                 throw new FileNotFoundException("The destination directory could not be found at: " + args.destinationDirectory.getAbsolutePath());
+            }
+            if(!args.destinationDirectory.isDirectory()) {
+                throw new DirectoryExpectedException("The destination directory argument given is not a directory");
             }
         }
     }
