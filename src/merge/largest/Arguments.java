@@ -45,17 +45,18 @@ public class Arguments {
     private List<File> inputDirectories;
     
     /**
-     * Destination File where the input directories largest file will be merged
-     * to. The default directory is the current working directory.
+     * The destination directory File is where the input directories\' largest
+     * file will be merged to. The default directory is the current working
+     * directory.
      */
-    private File destinationFile;
+    private File destinationDirectory;
     
     /**
      * Creates a new Arguments instance
      */
     private Arguments() {
         inputDirectories = new ArrayList<File>();
-        destinationFile = new File(".");
+        destinationDirectory = new File(".");
     }
 
     /**
@@ -75,11 +76,11 @@ public class Arguments {
     }
 
     /**
-     * Get the destination File
-     * @return Destination File
+     * Get the destination directory File
+     * @return Destination directory File
      */
     public File getDestinationFile() {
-        return destinationFile;
+        return destinationDirectory;
     }
 
     /**
@@ -88,6 +89,20 @@ public class Arguments {
      */
     public List<File> getInputDirectories() {
         return inputDirectories;
+    }
+    
+    /**
+     * Gets a platform independent File based on the path given. This can be
+     * used to convert virtual paths to real locations i.e. /cygdrive/c/ = C:\
+     * if using Cygwin.
+     * @param path Path to create a File from
+     * @return Platform Independent File
+     */
+    private static File getPlatformIndependentFile(String path) {
+        if(path.startsWith("/cygdrive/")) {
+            return new File(new StringBuilder().append(path.charAt(10)).append(":\\").append(path.substring(12)).toString());
+        }
+        return new File(path);
     }
     
     /**
@@ -107,11 +122,12 @@ public class Arguments {
         boolean isArg = false;
         for (int i = 0; i < args.length; i++) {
             if(isArg) {
+                isArg = false;
                 continue;
             }
             if (args[i].equals("-d") || args[i].equals("--dest-dir")) {
                 if (i + 1 < args.length) {
-                    arguments.destinationFile = new File(args[i + 1]);
+                    arguments.destinationDirectory = getPlatformIndependentFile(args[i + 1]);
                     isArg = true;
                     continue;
                 }
@@ -125,10 +141,7 @@ public class Arguments {
                 arguments.isTestMode = true;
                 continue;
             }
-            if (args[i].startsWith("/cygdrive/")) {
-                args[i] = new StringBuilder().append(args[i].charAt(10)).append(":\\").append(args[i].substring(12)).toString();
-            }
-            arguments.inputDirectories.add(new File(args[i]));
+            arguments.inputDirectories.add(getPlatformIndependentFile(args[i]));
         }
         if (arguments.inputDirectories.isEmpty()) {
             throw new ArgumentException("No input directories were given");
@@ -148,9 +161,9 @@ public class Arguments {
                 throw new FileNotFoundException("Could not find the directory: " + arg.getAbsolutePath());
             }
         }
-        if (args.destinationFile != null) {
-            if (!args.destinationFile.exists()) {
-                throw new FileNotFoundException("The destination directory could not be found at: " + args.destinationFile.getAbsolutePath());
+        if (args.destinationDirectory != null) {
+            if (!args.destinationDirectory.exists()) {
+                throw new FileNotFoundException("The destination directory could not be found at: " + args.destinationDirectory.getAbsolutePath());
             }
         }
     }
