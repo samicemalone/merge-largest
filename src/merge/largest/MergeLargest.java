@@ -28,6 +28,10 @@
  */
 package merge.largest;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Sam Malone
@@ -38,7 +42,7 @@ public class MergeLargest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Arguments arg;
+        Arguments arg = null;
         try {
             arg = Arguments.parse(args);
             if(arg == null) {
@@ -50,6 +54,23 @@ public class MergeLargest {
             System.err.println(e.getMessage());
             System.exit(1);
         }
+        List<File> emptyDirs = new ArrayList<File>();
+        FileIO io = new FileIO(arg.isTestMode());
+        
+        // move largest files
+        for(File inputDir : arg.getInputDirectories()) {
+            File largestFile;
+            if((largestFile = FileIO.getLargestFile(inputDir, arg.isRecursive())) == null) {
+                emptyDirs.add(inputDir);
+                System.out.println("Notice: " + inputDir.getAbsolutePath() + " contains no files.");
+                continue;
+            }
+            io.moveFileToDirectory(largestFile, arg.getDestinationDirectory());
+        }
+        // delete directories
+        for(File inputDir : arg.getInputDirectories()) {
+            io.deleteDirectory(inputDir, emptyDirs);
+        }
     }
     
     public static void printHelp() {
@@ -58,9 +79,11 @@ public class MergeLargest {
         System.out.println("The largest file in each DIRECTORY will be merged into DESTINATION if -d is set.");
         System.out.println("If -d is not set, DESTINATION will default to the current working directory.");
         System.out.println("After moving the largest file out of each DIRECTORY, DIRECTORY is deleted.");
-        System.out.println("If the recursive option (-r) is not used, AND, DIRECTORY contains no files");
-        System.out.println("(regardless of whether DIRECTORY contains subdirectories), then DIRECTORY");
-        System.out.println("will NOT be deleted.");
+        System.out.println();
+        System.out.println("If the recursive flag is set, and there are no files in any descendant");
+        System.out.println("directories within DIRECTORY, then DIRECTORY will not be deleted. If the");
+        System.out.println("recursive flag is not set and DIRECTORY doesn't contain any files, it will not");
+        System.out.println("be deleted.");
         System.out.println();
         System.out.println("    -d, --dest-dir DESTINATION  Destination directory for the largest file");
         System.out.println("                                in each DIRECTORY to be moved to");
