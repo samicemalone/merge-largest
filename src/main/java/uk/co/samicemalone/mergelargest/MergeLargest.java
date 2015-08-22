@@ -31,12 +31,17 @@ package uk.co.samicemalone.mergelargest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  *
  * @author Sam Malone
  */
 public class MergeLargest {
+
+    private static String[] archivePatterns = new String[] {
+        "zip", "rar", "r[0-9]+", "ace", "tar", "gz", "bz2", "7z"
+    };
 
     /**
      * @param args the command line arguments
@@ -54,6 +59,7 @@ public class MergeLargest {
             System.err.println(e.getMessage());
             System.exit(1);
         }
+        List<File> skipDirs = new ArrayList<File>();
         List<File> emptyDirs = new ArrayList<File>();
         FileIO io = new FileIO(arg.isTestMode());
         
@@ -65,12 +71,36 @@ public class MergeLargest {
                 System.out.println("Notice: " + inputDir.getAbsolutePath() + " contains no files.");
                 continue;
             }
+            if(skipFile(largestFile)) {
+                skipDirs.add(inputDir);
+                continue;
+            }
             io.moveFileToDirectory(largestFile, arg.getDestinationDirectory());
+        }
+        // remove skipped directories from the input list so they don't get deleted
+        for (File inputDir : skipDirs) {
+            arg.getInputDirectories().remove(inputDir);
         }
         // delete directories
         for(File inputDir : arg.getInputDirectories()) {
             io.deleteDirectory(inputDir, emptyDirs);
         }
+    }
+
+    private static boolean skipFile(File largestFile) {
+        for (String pattern : archivePatterns) {
+            if(largestFile.getName().matches("^.*?\\." + pattern)) {
+                System.out.println("The largest file is an archive: " +  largestFile.getName());
+                System.out.print("Are you sure you want to merge it? [y/N] ");
+                String line = new Scanner(System.in).nextLine();
+                if(!line.matches("[yY]")) {
+                    System.out.println("Skipping merging " + largestFile.getName());
+                    return true;
+                }
+                return false;
+            }
+        }
+        return false;
     }
     
     public static void printHelp() {
